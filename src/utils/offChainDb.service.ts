@@ -35,11 +35,6 @@ export class OffChainDbService {
 		index: number;
 		proposalType: string;
 	}) {
-		console.log({
-			network,
-			index,
-			proposalType,
-		});
 		const postDocSnapshot = await this.firestoreDb
 			.collection("posts")
 			.where("proposalType", "==", proposalType)
