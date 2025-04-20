@@ -2,13 +2,15 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getNetworkFromHeaders } from "./getNetworkFromHeaders";
 
 export const withErrorHandling = (handler: {
-	(req: NextRequest, context?: unknown): Promise<NextResponse>;
+	(req: NextRequest, context?: any): Promise<NextResponse>;
 }) => {
-	return async (req: NextRequest, context?: unknown) => {
+	return async (req: NextRequest, context?: any) => {
 		try {
 			// check if network header is valid, throws error if not
 			await getNetworkFromHeaders();
