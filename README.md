@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Overview
 
-## Getting Started
+This Proof of Concept (PoC) demonstrates a Next.js application that will be migrated from Vercel to Google Cloud Platform (GCP). The application provides a posts listing and viewing system with on-chain and off-chain data integration.
 
-First, run the development server:
+## Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Posts Listing and Viewing
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Home Page (`src/app/(home)/page.tsx`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Displays a list of posts fetched from the API
+- Each post shows a title and content with a link to view details
+- Posts are fetched via `ClientFetchService.fetchPostsList()`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### Post Detail Page (`src/app/(home)/post/[id]/page.tsx`)
 
-## Learn More
+- Displays individual post details
+- Shows full JSON data of a single post
+- Includes a back button to return to the home page
 
-To learn more about Next.js, take a look at the following resources:
+#### Intercepted Route Modal (`src/app/@modal/(.)post/[id]/page.tsx`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- When navigating from the home page to a post details page, a modal is displayed instead of a full page transition
+- The modal contains the post details with a close button
+- Utilizes Next.js intercepted routes for enhanced UX
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Navigation Behavior
 
-## Deploy on Vercel
+- Clicking a post on the home page opens a modal with post details (intercepted route)
+- Directly navigating to a post URL (e.g., `/post/123`) opens the full post page
+- This provides a seamless user experience with different viewing contexts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Network Determination
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### API Network Selection (`src/utils/getNetworkFromHeaders.ts`)
+
+- The network or chain-name is determined via the "x-network" header for API requests
+- Networks supported include KUSAMA and POLKADOT as defined in `src/types.ts`
+
+#### Frontend Network Selection
+
+- For the front-end, the network is determined by the subdomain
+- For example, `kusama.domain.com` would use the KUSAMA network
+- Falls back to default network in development environments
+
+### API Implementation
+
+#### Posts API (`src/app/api/posts/route.ts`)
+
+- Fetches posts with pagination support
+- Combines on-chain data from `OnChainDbService` with off-chain data from `OffChainDbService`
+- Uses the network determined from headers to fetch appropriate data
+
+## Architecture
+
+- Built with Next.js App Router
+- Utilizes Next.js 13+ features including intercepted routes for modal handling
+- Fetches data from backend services using a client service pattern
+
+## Technical Implementation
+
+- Server components for data fetching
+- Modal UI for enhanced user experience
+- Network-specific data retrieval based on request context
+- Error handling and fallback mechanisms
+
+---
+
+This PoC successfully demonstrates the core functionality needed for the migration from Vercel to GCP while preserving all interactive features and network-specific behaviors.
