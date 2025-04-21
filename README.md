@@ -51,6 +51,50 @@ This Proof of Concept (PoC) demonstrates a Next.js application that will be migr
 - Combines on-chain data from `OnChainDbService` with off-chain data from `OffChainDbService`
 - Uses the network determined from headers to fetch appropriate data
 
+### Backend API Architecture
+
+#### API Endpoints
+
+- **List Posts (`GET /api/posts`)**: Retrieves a paginated list of posts with configurable page and limit parameters
+- **Get Post Details (`GET /api/posts/[index]`)**: Retrieves detailed information about a specific post by its index
+
+#### Data Sources Integration
+
+The API integrates data from two primary sources:
+
+1. **On-Chain Data Service (`OnChainDbService`)**
+
+   - Connects to Subsquid GraphQL endpoints specific to each network (POLKADOT, KUSAMA)
+   - Retrieves blockchain data using GraphQL queries
+   - Fetches proposal information like status, proposer, creation date, and chain-specific metadata
+
+2. **Off-Chain Data Service (`OffChainDbService`)**
+   - Connects to Firebase Firestore database
+   - Retrieves supplementary post content, comments, and other non-blockchain data
+   - Provides richer content and user-generated information
+
+#### Network Determination Logic
+
+- Uses `getNetworkFromHeaders()` to determine which blockchain network to query:
+  1. First checks the `x-network` header in the request
+  2. If not found, attempts to determine network from the subdomain (e.g., kusama.domain.com)
+  3. Falls back to the default network in development environments
+
+#### Data Merging Process
+
+The API performs a multi-step process to serve complete post data:
+
+1. Fetches on-chain posts list from Subsquid with pagination
+2. For each on-chain post, retrieves corresponding off-chain data from Firestore
+3. Merges both data sources to create comprehensive post objects
+4. Returns combined data with proper pagination metadata
+
+#### Error Handling
+
+- Uses a `withErrorHandling` wrapper for consistent error responses
+- Validates request parameters using Zod schema validation
+- Provides appropriate error messages and status codes for different failure scenarios
+
 ## Architecture
 
 - Built with Next.js App Router
